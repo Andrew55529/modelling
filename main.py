@@ -6,17 +6,17 @@ import matplotlib.pyplot as plt
 
 GUI = False
 
-g = 10
-m = 1
-L = 0.5
-q0 = 0.0
-qd = math.pi/2
+g = 10 # ускорение свободного падения
+m = 1 # масса маятника
+L = 0.5 # длина маятника
+q0 = 0.0 # начальное положение
+qd = math.pi/2  # желаемое положение
 
 
-dt = 1 / 240  # pybullet simulation step
-t = 0
-maxTime = 3
-T = 2
+dt = 1 / 240  # шаг симуляции
+
+maxTime = 3 # время симуляции
+T = 2 # время движения
 kf = 0.1
 
 kp = 5005
