@@ -144,7 +144,7 @@ for t in logTime[1:]:
     acc = (vel - prev_vel) / dt
     ddd=(acc-prev_acc)/dt
     prev_vel = vel
-    prev_acc = ddd
+    prev_acc = acc
 
     logRef[idx] = posd
     logRefd[idx] = veld
