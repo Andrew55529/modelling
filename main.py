@@ -51,11 +51,13 @@ logPos = np.zeros(sz)
 logVel = np.zeros(sz)
 logAcc = np.zeros(sz)
 logCtr = np.zeros(sz - 1)
+logddd = np.zeros(sz)
 logPos[0] = q0
 logRef = np.zeros(sz)
 logRef[0] = q0
 logRefd = np.zeros(sz)
 logRefdd = np.zeros(sz)
+logRefddd = np.zeros(sz)
 
 p.changeDynamics(bodyId, 1, linearDamping=0)
 
@@ -127,8 +129,9 @@ def feedback_lin(pos, vel, posd, veld, accd):
 
 
 prev_vel = 0
+prev_acc=0
 for t in logTime[1:]:
-    (posd, veld, accd, x3d) = degree_7_interpol(q0, qd, T, t)
+    (posd, veld, accd, ddd_r) = degree_7_interpol(q0, qd, T, t)
     ctrl = feedback_lin(pos, vel, posd, veld, accd)
 
     p.setJointMotorControl2(bodyIndex=bodyId,
@@ -139,15 +142,19 @@ for t in logTime[1:]:
     pos = p.getJointState(bodyId, 1)[0]
     vel = p.getJointState(bodyId, 1)[1]
     acc = (vel - prev_vel) / dt
+    ddd=(acc-prev_acc)/dt
     prev_vel = vel
+    prev_acc = ddd
 
     logRef[idx] = posd
     logRefd[idx] = veld
     logRefdd[idx] = accd
+    logRefddd[idx] = ddd_r
 
     logPos[idx] = pos
     logVel[idx] = vel
     logAcc[idx] = acc
+    logddd[idx] = ddd
     logCtr[idx - 1] = ctrl
 
     idx += 1
@@ -160,25 +167,31 @@ p.disconnect()
 
 
 
-plt.subplot(4, 1, 1)
+plt.subplot(5, 1, 1)
 plt.grid(True)
 plt.plot(logTime, logPos, label="Pos")
 plt.plot(logTime, logRef, label="PosRef")
 plt.legend()
 
-plt.subplot(4, 1, 2)
+plt.subplot(5, 1, 2)
 plt.grid(True)
 plt.plot(logTime, logVel, label="Vel")
 plt.plot(logTime, logRefd, label="VelRef")
 plt.legend()
 
-plt.subplot(4, 1, 3)
+plt.subplot(5, 1, 3)
 plt.grid(True)
 plt.plot(logTime, logAcc, label="Acc")
-plt.plot(logTime, logRefdd, label="Accref")
+plt.plot(logTime, logRefdd, label="AccRef")
 plt.legend()
 
-plt.subplot(4, 1, 4)
+plt.subplot(5, 1, 4)
+plt.grid(True)
+plt.plot(logTime, logddd, label="ddd")
+plt.plot(logTime, logRefddd, label="dddRef")
+plt.legend()
+
+plt.subplot(5, 1, 5)
 plt.grid(True)
 plt.plot(logTime[0:-1], logCtr, label="Ctr")
 plt.legend()
